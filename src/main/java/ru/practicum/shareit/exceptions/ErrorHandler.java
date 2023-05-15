@@ -9,18 +9,18 @@ import ru.practicum.shareit.user.UserController;
 
 import java.util.Map;
 
-@RestControllerAdvice(assignableTypes = {ItemController.class , UserController.class})
+@RestControllerAdvice(assignableTypes = {ItemController.class, UserController.class})
 public class ErrorHandler {
 
     @ExceptionHandler({UserNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> UserNotFoundException(final UserNotFoundException e) {
+    public Map<String, String> userNotFound(final UserNotFoundException e) {
         return Map.of("User exception: ", e.getMessage());
     }
 
     @ExceptionHandler({EmailExistException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
-    public Map<String, String> EmailExistException(final EmailExistException e) {
+    public Map<String, String> emailExistException(final EmailExistException e) {
         return Map.of("User exception: ", e.getMessage());
     }
 }

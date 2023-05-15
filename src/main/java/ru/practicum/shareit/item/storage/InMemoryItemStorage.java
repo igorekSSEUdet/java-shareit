@@ -24,8 +24,8 @@ public class InMemoryItemStorage implements ItemStorage {
 
     private final Map<Integer, HashMap<Integer, Item>> items = new HashMap<>();
     private final UserStorage userStorage;
-    private int id = 0;
     private final DateTimeFormatter logTimeFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+    private int id = 0;
 
     @Autowired
     public InMemoryItemStorage(@Qualifier("inMemoryUserStorage") UserStorage userStorage) {

@@ -19,13 +19,12 @@ import java.util.*;
 public class InMemoryUserStorage implements UserStorage {
 
     private final Map<Integer, User> users = new HashMap<>();
-    private int id = 0;
-
     private final DateTimeFormatter logTimeFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+    private int id = 0;
 
     @Override
     public Optional<UserDto> createUser(User user) {
-        if (isEmailExists(user.getEmail(),-1)) {
+        if (isEmailExists(user.getEmail(), -1)) {
             throw new EmailExistException("User with" + user.getEmail() + "email already exists");
         } else {
             user.setId(++id);
@@ -40,8 +39,7 @@ public class InMemoryUserStorage implements UserStorage {
         if (users.containsKey(userId)) {
             log.info(LocalDateTime.now().format(logTimeFormat) + " : Получен пользователь с id = " + userId);
             return Optional.of(UserDtoMapper.toUserDto(users.get(userId)));
-        }
-        else {
+        } else {
             throw new UserNotFoundException("User with userId = " + userId + " not found");
         }
     }
@@ -54,9 +52,9 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public Optional<UserDto> updateUser(User user, int id) {
-       User user1 = getUser(id);
-        if (checkHasUser(id) && !isEmailExists(user.getEmail(),id)) {
-            users.put(id, getUserForUpdate(user1,user));
+        User user1 = getUser(id);
+        if (checkHasUser(id) && !isEmailExists(user.getEmail(), id)) {
+            users.put(id, getUserForUpdate(user1, user));
             log.info(LocalDateTime.now().format(logTimeFormat) + " : Обновлен пользователь с id = " + id);
             return Optional.of(UserDtoMapper.toUserDto(users.get(id)));
         } else throw new EmailExistException("User with" + user.getEmail() + "email already exists");
@@ -76,7 +74,7 @@ public class InMemoryUserStorage implements UserStorage {
         return users.containsKey(userId);
     }
 
-    private boolean isEmailExists(String email,int userId) {
+    private boolean isEmailExists(String email, int userId) {
         return users.values().stream()
                 .anyMatch(u -> u.getEmail().equals(email) && u.getId() != userId);
     }

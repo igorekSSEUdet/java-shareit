@@ -24,12 +24,12 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Optional<ItemDto> createItem(Item item, int userId) {
-        return storage.createItem(item,userId);
+        return storage.createItem(item, userId);
     }
 
     @Override
     public Optional<ItemDto> getItemById(int itemId, int userId) {
-        return storage.getItemById(itemId,userId);
+        return storage.getItemById(itemId, userId);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Optional<ItemDto> updateItem(Item item, int id, int userId) {
-        return storage.updateItem(item, id,userId);
+        return storage.updateItem(item, id, userId);
     }
 
     @Override
@@ -49,6 +49,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void deleteItem(int id, int userId) {
-         storage.deleteItem(id,userId);
+        storage.deleteItem(id, userId);
     }
 }

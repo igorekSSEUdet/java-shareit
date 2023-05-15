@@ -33,7 +33,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Optional<UserDto>  getUserById(@PathVariable int id) {
+    public Optional<UserDto> getUserById(@PathVariable int id) {
         return service.getUserById(id);
     }
 
