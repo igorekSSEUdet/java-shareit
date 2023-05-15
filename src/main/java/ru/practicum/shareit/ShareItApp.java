@@ -10,4 +10,6 @@ public class ShareItApp {
 		SpringApplication.run(ShareItApp.class, args);
 	}
 
+	// TODO другие сущности тоже допиши, доделай сущности из тз "ментор"
+
 }
