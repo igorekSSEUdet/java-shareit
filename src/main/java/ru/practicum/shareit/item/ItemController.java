@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.utills.HttpHeaders;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -24,25 +25,25 @@ public class ItemController {
     }
 
     @PostMapping
-    public Optional<ItemDto> createItem(@RequestBody @Valid Item item, @RequestHeader("X-Sharer-User-Id") int userId) {
+    public Optional<ItemDto> createItem(@RequestBody @Valid Item item, @RequestHeader(HttpHeaders.USER_ID) int userId) {
         return service.createItem(item, userId);
     }
 
     @GetMapping("/{itemId}")
-    public Optional<ItemDto> getItemById(@PathVariable int itemId, @RequestHeader("X-Sharer-User-Id") int userId) {
+    public Optional<ItemDto> getItemById(@PathVariable int itemId, @RequestHeader(HttpHeaders.USER_ID) int userId) {
         return service.getItemById(itemId, userId);
 
     }
 
     @GetMapping
-    public List<Item> getAllItemsByUserId(@RequestHeader("X-Sharer-User-Id") int userId) {
+    public List<Item> getAllItemsByUserId(@RequestHeader(HttpHeaders.USER_ID) int userId) {
         return service.getAllItemsByUserId(userId);
 
     }
 
     @PatchMapping("/{id}")
     public Optional<ItemDto> updateItem(@RequestBody Item item, @PathVariable int id,
-                                        @NotEmpty @RequestHeader("X-Sharer-User-Id") int userId) {
+                                        @NotEmpty @RequestHeader(HttpHeaders.USER_ID) int userId) {
         return service.updateItem(item, id, userId);
 
     }
@@ -53,7 +54,7 @@ public class ItemController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteItem(@PathVariable int id, @RequestHeader("X-Sharer-User-Id") int userId) {
+    public void deleteItem(@PathVariable int id, @RequestHeader(HttpHeaders.USER_ID) int userId) {
         service.deleteItem(id, userId);
     }
 }

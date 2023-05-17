@@ -1,7 +1,6 @@
 package ru.practicum.shareit.user.storage;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exceptions.EmailExistException;
 import ru.practicum.shareit.exceptions.UserNotFoundException;
@@ -14,7 +13,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Component
-@Scope("singleton")
 @Slf4j
 public class InMemoryUserStorage implements UserStorage {
 
@@ -24,7 +22,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public Optional<UserDto> createUser(User user) {
-        if (isEmailExists(user.getEmail(), -1)) {
+        if (isEmailExistsWithoutId(user.getEmail())) {
             throw new EmailExistException("User with" + user.getEmail() + "email already exists");
         } else {
             user.setId(++id);
@@ -77,6 +75,11 @@ public class InMemoryUserStorage implements UserStorage {
     private boolean isEmailExists(String email, int userId) {
         return users.values().stream()
                 .anyMatch(u -> u.getEmail().equals(email) && u.getId() != userId);
+    }
+
+    private boolean isEmailExistsWithoutId(String email) {
+        return users.values().stream()
+                .anyMatch(u -> u.getEmail().equals(email));
     }
 
     private User getUser(int id) {
