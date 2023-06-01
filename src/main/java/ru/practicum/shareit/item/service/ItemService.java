@@ -1,22 +1,36 @@
 package ru.practicum.shareit.item.service;
 
+import ru.practicum.shareit.item.dto.DetailedItemDto;
+import ru.practicum.shareit.item.dto.ItemCreationRequestDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.dto.ItemUpdateRequestDto;
+import ru.practicum.shareit.item.exception.ItemNotFoundException;
+import ru.practicum.shareit.item.repository.ItemRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ItemService {
+    static void checkItemExistsById(ItemRepository itemRepository, Long itemId) {
+        if (!itemRepository.existsById(itemId)) {
+            throw ItemNotFoundException.getFromItemId(itemId);
+        }
+    }
 
-    Optional<ItemDto> createItem(Item item, int userId);
+    static void checkOwnerOfItemByItemIdAndUserId(ItemRepository itemRepository,
+                                                  Long itemId, Long userId) {
+        Long ownerId = itemRepository.getReferenceById(itemId).getOwner().getId();
+        if (!ownerId.equals(userId)) {
+            throw ItemNotFoundException.getFromItemIdAndUserId(itemId, userId);
+        }
+    }
 
-    Optional<ItemDto> getItemById(int id, int userId);
+    ItemDto addItem(ItemCreationRequestDto itemDto, Long ownerId);
 
-    List<Item> getAllItemsByUserId(int userId);
+    ItemDto updateItem(ItemUpdateRequestDto itemDto, Long itemId, Long ownerId);
 
-    Optional<ItemDto> updateItem(Item item, int id, int userId);
+    DetailedItemDto getItemByItemId(Long itemId, Long userId);
 
-    List<Item> searchItem(String text);
+    List<DetailedItemDto> getItemsByOwnerId(Long ownerId);
 
-    void deleteItem(int id, int userId);
+    List<ItemDto> searchItemsByNameOrDescription(String text);
 }

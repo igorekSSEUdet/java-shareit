@@ -4,11 +4,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+
 @Setter
+@Getter
 @NoArgsConstructor
-public class UserDto {
-    private Long id;
+public class UserCreationRequestDto {
+    @NotNull
     private String name;
+
+    @Email
+    @NotNull
     private String email;
 }

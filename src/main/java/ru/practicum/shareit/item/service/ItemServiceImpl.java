@@ -1,52 +1,109 @@
 package ru.practicum.shareit.item.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.mapper.BookingDtoMapper;
+import ru.practicum.shareit.item.dto.DetailedItemDto;
+import ru.practicum.shareit.item.dto.ItemCreationRequestDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemUpdateRequestDto;
+import ru.practicum.shareit.user.mapper.CommentDtoMapper;
+import ru.practicum.shareit.user.mapper.ItemDtoMapper;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.storage.ItemStorage;
+import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
-@Component
+import static ru.practicum.shareit.item.service.ItemService.checkItemExistsById;
+import static ru.practicum.shareit.item.service.ItemService.checkOwnerOfItemByItemIdAndUserId;
+import static ru.practicum.shareit.user.service.UserService.checkUserExistsById;
+
+@Service
+@Slf4j
+@Transactional
 public class ItemServiceImpl implements ItemService {
+    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
+    private final ItemDtoMapper itemDtoMapper;
+    private final BookingDtoMapper bookingDtoMapper;
+    private final CommentDtoMapper commentDtoMapper;
 
-    private final ItemStorage storage;
+    public ItemServiceImpl(ItemRepository itemRepository,
+                           UserRepository userRepository,
+                           ItemDtoMapper itemDtoMapper,
+                           BookingDtoMapper bookingDtoMapper,
+                           CommentDtoMapper commentDtoMapper) {
+        this.itemRepository = itemRepository;
+        this.userRepository = userRepository;
+        this.itemDtoMapper = itemDtoMapper;
+        this.bookingDtoMapper = bookingDtoMapper;
+        this.commentDtoMapper = commentDtoMapper;
+    }
 
-    @Autowired
-    public ItemServiceImpl(@Qualifier("inMemoryItemStorage") ItemStorage storage) {
-        this.storage = storage;
+    private static boolean isOwner(Item item, Long userId) {
+        Long ownerId = item.getOwner().getId();
+        return ownerId.equals(userId);
     }
 
     @Override
-    public Optional<ItemDto> createItem(Item item, int userId) {
-        return storage.createItem(item, userId);
+    public ItemDto addItem(ItemCreationRequestDto itemDto, Long ownerId) {
+        checkUserExistsById(userRepository, ownerId);
+        Item item = itemDtoMapper.toItem(itemDto, ownerId);
+        Item addedItem = itemRepository.save(item);
+        log.debug("Item ID_{} added.", addedItem.getId());
+        return itemDtoMapper.toItemDto(addedItem);
     }
 
     @Override
-    public Optional<ItemDto> getItemById(int itemId, int userId) {
-        return storage.getItemById(itemId, userId);
+    public ItemDto updateItem(ItemUpdateRequestDto itemDto, Long itemId, Long userId) {
+        checkItemExistsById(itemRepository, itemId);
+        checkUserExistsById(userRepository, userId);
+        checkOwnerOfItemByItemIdAndUserId(itemRepository, itemId, userId);
+        Item item = itemDtoMapper.toItem(itemDto, itemId, userId);
+        Item updatedItem = itemRepository.save(item);
+        log.debug("Item ID_{} updated.", itemId);
+        return itemDtoMapper.toItemDto(updatedItem);
     }
 
     @Override
-    public List<Item> getAllItemsByUserId(int userId) {
-        return storage.getAllItemsByUserId(userId);
+    @Transactional(readOnly = true)
+    public DetailedItemDto getItemByItemId(Long itemId, Long userId) {
+        checkItemExistsById(itemRepository, itemId);
+        Item item = itemRepository.findById(itemId).get();
+        log.debug("Item ID_{} returned.", item.getId());
+        if (isOwner(item, userId)) {
+            return itemDtoMapper.toDetailedItemDtoForOwner(item, commentDtoMapper, bookingDtoMapper);
+        }
+        return itemDtoMapper.toDetailedItemDto(item, commentDtoMapper);
     }
 
     @Override
-    public Optional<ItemDto> updateItem(Item item, int id, int userId) {
-        return storage.updateItem(item, id, userId);
+    @Transactional(readOnly = true)
+    public List<DetailedItemDto> getItemsByOwnerId(Long ownerId) {
+        List<Item> items = itemRepository.findByOwnerId(ownerId);
+        log.debug("All items have been returned, {} in total.", items.size());
+        return itemDtoMapper.toDetailedItemDto(items, commentDtoMapper, bookingDtoMapper);
     }
 
     @Override
-    public List<Item> searchItem(String text) {
-        return storage.searchItem(text);
-    }
+    @Transactional(readOnly = true)
+    public List<ItemDto> searchItemsByNameOrDescription(String text) {
+        if (StringUtils.isEmpty(text)) {
+            return Collections.emptyList();
+        }
 
-    @Override
-    public void deleteItem(int id, int userId) {
-        storage.deleteItem(id, userId);
+        List<Item> foundItems = itemRepository.findByIsAvailableIsTrue()
+                .stream()
+                .filter(itemDto -> StringUtils.containsIgnoreCase(itemDto.getName(), text)
+                        || StringUtils.containsIgnoreCase(itemDto.getDescription(), text))
+                .collect(Collectors.toList());
+        log.debug("Returned items containing '{}', {} in total.", text, foundItems.size());
+
+        return itemDtoMapper.toItemDto(foundItems);
     }
 }

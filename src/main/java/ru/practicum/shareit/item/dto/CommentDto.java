@@ -4,12 +4,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
+import java.time.LocalDateTime;
+
 @Setter
+@Getter
 @NoArgsConstructor
-public class ItemDto {
+public class CommentDto {
     private Long id;
-    private String name;
-    private String description;
-    private Boolean available;
+    private String text;
+    private String authorName;
+    private LocalDateTime created;
 }
