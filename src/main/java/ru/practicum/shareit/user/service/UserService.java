@@ -1,21 +1,27 @@
 package ru.practicum.shareit.user.service;
 
+import ru.practicum.shareit.user.dto.UserCreationRequestDto;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.dto.UserUpdateRequestDto;
+import ru.practicum.shareit.user.exception.UserNotFoundException;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserService {
+    static void checkUserExistsById(UserRepository userRepository, Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw UserNotFoundException.getFromUserId(userId);
+        }
+    }
 
-    Optional<UserDto> createUser(User user);
+    UserDto addUser(UserCreationRequestDto userDto);
 
-    Optional<UserDto> getUserById(int id);
+    UserDto updateUser(UserUpdateRequestDto userDto, Long userId);
 
-    List<User> getAllUsers();
+    UserDto getUserById(Long userId);
 
-    Optional<UserDto> updateUser(User user, int id);
+    List<UserDto> getAllUsers();
 
-    int deleteUser(int id);
-
+    void deleteUserById(Long userId);
 }
