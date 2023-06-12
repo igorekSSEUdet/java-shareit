@@ -50,8 +50,7 @@ public class ItemServiceTest {
 
     @BeforeEach
     public void setUp() {
-        this.itemService = new ItemServiceImpl(itemRepository, userRepository, itemDtoMapper, bookingDtoMapper
-                , commentDtoMapper, requestRepository);
+        this.itemService = new ItemServiceImpl(itemRepository, userRepository, itemDtoMapper, bookingDtoMapper, commentDtoMapper, requestRepository);
     }
 
     @Test

@@ -31,14 +31,11 @@ import static ru.practicum.shareit.utills.UserHttpHeaders.USER_ID;
 @ExtendWith(MockitoExtension.class)
 public class RequestControllerTest {
 
+    private final ObjectMapper mapper = new ObjectMapper();
     @Mock
     private RequestService service;
-
     @InjectMocks
     private ItemRequestController controller;
-
-    private final ObjectMapper mapper = new ObjectMapper();
-
     private MockMvc mvc;
 
     @BeforeEach

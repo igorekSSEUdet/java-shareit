@@ -52,8 +52,7 @@ public class BookingServiceTest {
 
     @BeforeEach
     public void setUp() {
-        this.bookingService = new BookingServiceImpl(bookingRepository, userRepository, itemRepository, bookingDtoMapper
-                , userDtoMapper, itemDtoMapper);
+        this.bookingService = new BookingServiceImpl(bookingRepository, userRepository, itemRepository, bookingDtoMapper, userDtoMapper, itemDtoMapper);
     }
 
 
@@ -285,8 +284,7 @@ public class BookingServiceTest {
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
 
-        when(bookingRepository.findBookingsByBookerIdAndStatusEquals(anyLong(), eq(WAITING)
-                , eq(PageRequest.of(from, size))))
+        when(bookingRepository.findBookingsByBookerIdAndStatusEquals(anyLong(), eq(WAITING), eq(PageRequest.of(from, size))))
                 .thenReturn(new PageImpl<>(List.of(booking)));
 
         when(bookingDtoMapper.toBookingDto(List.of(booking), userDtoMapper, itemDtoMapper))
@@ -314,8 +312,7 @@ public class BookingServiceTest {
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
 
-        when(bookingRepository.findBookingsByBookerIdAndStatusEquals(anyLong(), eq(REJECTED)
-                , eq(PageRequest.of(from, size))))
+        when(bookingRepository.findBookingsByBookerIdAndStatusEquals(anyLong(), eq(REJECTED), eq(PageRequest.of(from, size))))
                 .thenReturn(new PageImpl<>(List.of(booking)));
 
         when(bookingDtoMapper.toBookingDto(List.of(booking), userDtoMapper, itemDtoMapper))
@@ -440,8 +437,7 @@ public class BookingServiceTest {
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
 
-        when(bookingRepository.findBookingsByItemOwnerIdAndStatusEquals(anyLong(), eq(WAITING)
-                , eq(PageRequest.of(from, size))))
+        when(bookingRepository.findBookingsByItemOwnerIdAndStatusEquals(anyLong(), eq(WAITING), eq(PageRequest.of(from, size))))
                 .thenReturn(new PageImpl<>(List.of(booking)));
 
         when(bookingDtoMapper.toBookingDto(List.of(booking), userDtoMapper, itemDtoMapper))
@@ -469,8 +465,7 @@ public class BookingServiceTest {
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
 
-        when(bookingRepository.findBookingsByItemOwnerIdAndStatusEquals(anyLong(), eq(REJECTED)
-                , eq(PageRequest.of(from, size))))
+        when(bookingRepository.findBookingsByItemOwnerIdAndStatusEquals(anyLong(), eq(REJECTED), eq(PageRequest.of(from, size))))
                 .thenReturn(new PageImpl<>(List.of(booking)));
 
         when(bookingDtoMapper.toBookingDto(List.of(booking), userDtoMapper, itemDtoMapper))

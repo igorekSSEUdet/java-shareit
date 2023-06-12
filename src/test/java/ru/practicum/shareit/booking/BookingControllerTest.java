@@ -35,11 +35,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 public class BookingControllerTest {
 
+    private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
     @InjectMocks
     BookingController controller;
     @Mock
     private BookingService bookingService;
-    private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
     private MockMvc mvc;
 
     @BeforeEach
