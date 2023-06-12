@@ -1,14 +1,16 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 
-@Setter
-@Getter
+@Data
+@AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class RequestCommentDto {
     @NotEmpty
     private String text;

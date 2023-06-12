@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @RestControllerAdvice
+//(assignableTypes = {ItemController.class, UserController.class, BookingController.class,
+//ItemRequestController.class})
 @Slf4j
 public class ErrorHandler {
     @ExceptionHandler
@@ -21,19 +23,25 @@ public class ErrorHandler {
         return ErrorResponse.getFromException(ex);
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse methodArgumentNotValidExceptionHandler(final MethodArgumentNotValidException ex) {
-        String message = ex.getBindingResult()
-                .getFieldErrors().stream()
-                .map(fieldError -> String.format(
-                        "field '%s' %s",
-                        fieldError.getField(),
-                        fieldError.getDefaultMessage()))
-                .collect(Collectors.joining(", "));
+//    @ExceptionHandler
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public ErrorResponse methodArgumentNotValidExceptionHandler(final MethodArgumentNotValidException ex) {
+//        String message = ex.getBindingResult()
+//                .getFieldErrors().stream()
+//                .map(fieldError -> String.format(
+//                        "field '%s' %s",
+//                        fieldError.getField(),
+//                        fieldError.getDefaultMessage()))
+//                .collect(Collectors.joining(", "));
+//
+//        log.error("Validation error: {}.", message);
+//        return ErrorResponse.getFromExceptionAndMessage(ex, message);
+//    }
 
-        log.error("Validation error: {}.", message);
-        return ErrorResponse.getFromExceptionAndMessage(ex, message);
+    @ExceptionHandler({MethodArgumentNotValidException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> methodArgumentNotValidException(final MethodArgumentNotValidException e) {
+        return Map.of("User exception: ", e.getMessage());
     }
 
     @ExceptionHandler

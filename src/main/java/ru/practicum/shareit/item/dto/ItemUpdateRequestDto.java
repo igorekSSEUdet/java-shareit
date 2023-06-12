@@ -1,18 +1,21 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.Optional;
 
-@Setter
-@Getter
+@Data
+@AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class ItemUpdateRequestDto {
     private String name;
     private String description;
     private Boolean available;
+
 
     public Optional<String> getName() {
         return Optional.ofNullable(name);

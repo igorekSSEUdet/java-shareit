@@ -9,18 +9,18 @@ import ru.practicum.shareit.item.dto.DetailedItemDto;
 import ru.practicum.shareit.item.dto.ItemCreationRequestDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemUpdateRequestDto;
-import ru.practicum.shareit.user.mapper.CommentDtoMapper;
-import ru.practicum.shareit.user.mapper.ItemDtoMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.storage.RequestRepository;
+import ru.practicum.shareit.user.mapper.CommentDtoMapper;
+import ru.practicum.shareit.user.mapper.ItemDtoMapper;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.practicum.shareit.item.service.ItemService.checkItemExistsById;
-import static ru.practicum.shareit.item.service.ItemService.checkOwnerOfItemByItemIdAndUserId;
+import static ru.practicum.shareit.item.service.ItemService.*;
 import static ru.practicum.shareit.user.service.UserService.checkUserExistsById;
 
 @Service
@@ -32,31 +32,41 @@ public class ItemServiceImpl implements ItemService {
     private final ItemDtoMapper itemDtoMapper;
     private final BookingDtoMapper bookingDtoMapper;
     private final CommentDtoMapper commentDtoMapper;
+    private final RequestRepository requestRepository;
 
     public ItemServiceImpl(ItemRepository itemRepository,
                            UserRepository userRepository,
                            ItemDtoMapper itemDtoMapper,
                            BookingDtoMapper bookingDtoMapper,
-                           CommentDtoMapper commentDtoMapper) {
+                           CommentDtoMapper commentDtoMapper, RequestRepository requestRepository) {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
         this.itemDtoMapper = itemDtoMapper;
         this.bookingDtoMapper = bookingDtoMapper;
         this.commentDtoMapper = commentDtoMapper;
+        this.requestRepository = requestRepository;
     }
 
-    private static boolean isOwner(Item item, Long userId) {
-        Long ownerId = item.getOwner().getId();
-        return ownerId.equals(userId);
-    }
 
     @Override
     public ItemDto addItem(ItemCreationRequestDto itemDto, Long ownerId) {
+        checkUserExistsById(userRepository, ownerId);
+        if (itemDto.getRequestId() == null) {
+            Item item = itemDtoMapper.toItem(itemDto, ownerId);
+            Item addedItem = itemRepository.save(item);
+            log.debug("Item ID_{} added.", addedItem.getId());
+            return itemDtoMapper.toItemDto(addedItem);
+        } else return addItemOnRequest(itemDto, ownerId);
+    }
+
+    private ItemDto addItemOnRequest(ItemCreationRequestDto itemDto, Long ownerId) {
+        checkHasRequest(requestRepository, itemDto.getRequestId());
         checkUserExistsById(userRepository, ownerId);
         Item item = itemDtoMapper.toItem(itemDto, ownerId);
         Item addedItem = itemRepository.save(item);
         log.debug("Item ID_{} added.", addedItem.getId());
         return itemDtoMapper.toItemDto(addedItem);
+
     }
 
     @Override
@@ -97,7 +107,7 @@ public class ItemServiceImpl implements ItemService {
             return Collections.emptyList();
         }
 
-        List<Item> foundItems = itemRepository.findByIsAvailableIsTrue()
+        List<Item> foundItems = itemRepository.findByAvailableIsTrue()
                 .stream()
                 .filter(itemDto -> StringUtils.containsIgnoreCase(itemDto.getName(), text)
                         || StringUtils.containsIgnoreCase(itemDto.getDescription(), text))

@@ -10,5 +10,7 @@ import java.util.List;
 public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Item> findByOwnerId(Long ownerId);
 
-    List<Item> findByIsAvailableIsTrue();
+    List<Item> findByAvailableIsTrue();
+
+    List<Item> findAllByRequestId(Long requestId);
 }

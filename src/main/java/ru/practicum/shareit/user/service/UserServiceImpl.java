@@ -2,6 +2,8 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.user.dto.UserCreationRequestDto;
@@ -24,6 +26,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserDtoMapper userDtoMapper;
 
+
     @Override
     public UserDto addUser(UserCreationRequestDto userDto) {
         User user = userDtoMapper.toUser(userDto);
@@ -42,6 +45,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable(value = "users", key = "#userId")
     @Transactional(readOnly = true)
     public UserDto getUserById(Long userId) {
         checkUserExistsById(userRepository, userId);
@@ -59,6 +63,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(value = "users", key = "#userId")
     public void deleteUserById(Long userId) {
         checkUserExistsById(userRepository, userId);
         log.debug("User ID_{} deleted.", userId);

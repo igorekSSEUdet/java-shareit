@@ -10,6 +10,9 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.comment.Comment;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.repository.comment.CommentRepository;
+import ru.practicum.shareit.request.exceptions.RequestNotFoundException;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.storage.RequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -25,12 +28,14 @@ import java.util.stream.Collectors;
 public class ItemDtoMapper {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final RequestRepository requestRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
 
-    public ItemDtoMapper(ItemRepository itemRepository, UserRepository userRepository, BookingRepository bookingRepository, CommentRepository commentRepository) {
+    public ItemDtoMapper(ItemRepository itemRepository, UserRepository userRepository, RequestRepository repository, BookingRepository bookingRepository, CommentRepository commentRepository) {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
+        this.requestRepository = repository;
         this.bookingRepository = bookingRepository;
         this.commentRepository = commentRepository;
     }
@@ -38,24 +43,31 @@ public class ItemDtoMapper {
     public Item toItem(ItemCreationRequestDto itemDto, Long ownerId) {
         Item item = new Item();
 
-        User owner = userRepository.findById(ownerId).get();
+        User owner = userRepository.findById(ownerId).orElseThrow();
 
         item.setName(itemDto.getName());
         item.setDescription(itemDto.getDescription());
-        item.setIsAvailable(itemDto.getAvailable());
+        item.setAvailable(itemDto.getAvailable());
         item.setOwner(owner);
+
+        if (itemDto.getRequestId() != null) {
+            ItemRequest request = requestRepository.findById(itemDto.getRequestId())
+                    .orElseThrow(() -> new RequestNotFoundException("Request not found error"));
+            item.setRequest(request);
+        }
 
         return item;
     }
 
-    public Item toItem(ItemUpdateRequestDto itemDto, Long itemId, Long ownerId) {
-        Item item = itemRepository.findById(itemId).get();
 
-        User owner = userRepository.findById(ownerId).get();
+    public Item toItem(ItemUpdateRequestDto itemDto, Long itemId, Long ownerId) {
+        Item item = itemRepository.findById(itemId).orElseThrow();
+
+        User owner = userRepository.findById(ownerId).orElseThrow();
 
         itemDto.getName().ifPresent(item::setName);
         itemDto.getDescription().ifPresent(item::setDescription);
-        itemDto.getAvailable().ifPresent(item::setIsAvailable);
+        itemDto.getAvailable().ifPresent(item::setAvailable);
         item.setOwner(owner);
 
         return item;
@@ -67,7 +79,11 @@ public class ItemDtoMapper {
         itemDto.setId(item.getId());
         itemDto.setName(item.getName());
         itemDto.setDescription(item.getDescription());
-        itemDto.setAvailable(item.getIsAvailable());
+        itemDto.setAvailable(item.getAvailable());
+
+        if (item.getRequest() != null) {
+            itemDto.setRequestId(item.getRequest().getId());
+        }
 
         return itemDto;
     }
@@ -89,7 +105,7 @@ public class ItemDtoMapper {
         itemDto.setId(item.getId());
         itemDto.setName(item.getName());
         itemDto.setDescription(item.getDescription());
-        itemDto.setAvailable(item.getIsAvailable());
+        itemDto.setAvailable(item.getAvailable());
         itemDto.setComments(commentDtoMapper.toCommentDto(comments));
 
         return itemDto;
@@ -145,10 +161,10 @@ public class ItemDtoMapper {
 
 
         if (lastBooking.isEmpty()) {
-            Optional<Booking> lastBookin2 = bookings.stream()
+            Optional<Booking> booking = bookings.stream()
                     .filter(b -> b.getStartTime().isBefore(time))
                     .min(Comparator.comparing(Booking::getEndTime));
-            return lastBookin2.map(bookingDtoMapper::toShortBookingDto).orElse(null);
+            return booking.map(bookingDtoMapper::toShortBookingDto).orElse(null);
         }
 
 

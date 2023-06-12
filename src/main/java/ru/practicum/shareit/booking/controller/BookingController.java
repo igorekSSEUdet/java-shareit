@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingCreationRequestDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.service.BookingGetRequest;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.utills.UserHttpHeaders;
 
@@ -37,13 +38,22 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> getAllByBookerId(@RequestHeader(UserHttpHeaders.USER_ID) Long bookerId,
-                                             @RequestParam(defaultValue = "ALL") String state) {
-        return bookingService.getAllByBookerId(bookerId, state);
+                                             @RequestParam(defaultValue = "ALL") String state,
+                                             @RequestParam(required = false) Integer from,
+                                             @RequestParam(required = false) Integer size) {
+
+        BookingGetRequest request = BookingGetRequest.builder()
+                .userId(bookerId).possibleState(state).from(from).size(size).build();
+        return bookingService.getAllByBookerId(request);
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getAllByBookerItems(@RequestHeader(UserHttpHeaders.USER_ID) Long ownerId,
-                                                @RequestParam(defaultValue = "ALL") String state) {
-        return bookingService.getAllByBookerItems(ownerId, state);
+                                                @RequestParam(defaultValue = "ALL") String state,
+                                                @RequestParam(required = false) Integer from,
+                                                @RequestParam(required = false) Integer size) {
+        BookingGetRequest request = BookingGetRequest.builder()
+                .userId(ownerId).possibleState(state).from(from).size(size).build();
+        return bookingService.getAllByBookerItems(request);
     }
 }
