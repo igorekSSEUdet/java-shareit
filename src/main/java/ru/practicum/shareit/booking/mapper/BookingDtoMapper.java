@@ -5,9 +5,9 @@ import ru.practicum.shareit.booking.dto.BookingCreationRequestDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.ShortBookingDto;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.user.mapper.ItemDtoMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.mapper.ItemDtoMapper;
 import ru.practicum.shareit.user.mapper.UserDtoMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -29,8 +29,8 @@ public class BookingDtoMapper {
     public Booking toBooking(BookingCreationRequestDto bookingDto, Long userId) {
         Booking booking = new Booking();
 
-        User booker = userRepository.findById(userId).get();
-        Item item = itemRepository.findById(bookingDto.getItemId()).get();
+        User booker = userRepository.findById(userId).orElseThrow();
+        Item item = itemRepository.findById(bookingDto.getItemId()).orElseThrow();
 
         booking.setStartTime(bookingDto.getStart());
         booking.setEndTime(bookingDto.getEnd());

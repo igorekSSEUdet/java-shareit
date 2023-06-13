@@ -12,6 +12,8 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static ru.practicum.shareit.booking.model.Booking.Status.APPROVED;
+
 public interface BookingService {
     static void checkBookingTimePeriod(LocalDateTime start, LocalDateTime end) {
         if (start.isAfter(end)) {
@@ -32,7 +34,7 @@ public interface BookingService {
     }
 
     static void checkBookingStatusNotApprove(Booking booking) {
-        if (booking.getStatus() == Booking.Status.APPROVED) {
+        if (booking.getStatus() == APPROVED) {
             throw BookingAlreadyApprovedException.getFromBookingId(booking.getId());
         }
     }
