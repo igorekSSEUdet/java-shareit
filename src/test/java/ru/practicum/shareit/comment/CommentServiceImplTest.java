@@ -48,8 +48,7 @@ public class CommentServiceImplTest {
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(itemRepository.existsById(anyLong())).thenReturn(true);
-        when(bookingRepository.existsByBookerIdAndItemIdAndEndTimeIsBefore(anyLong()
-                , anyLong(), any(LocalDateTime.class))).thenReturn(true);
+        when(bookingRepository.existsByBookerIdAndItemIdAndEndTimeIsBefore(anyLong(), anyLong(), any(LocalDateTime.class))).thenReturn(true);
 
         RequestCommentDto request = new RequestCommentDto();
         request.setText("comment");

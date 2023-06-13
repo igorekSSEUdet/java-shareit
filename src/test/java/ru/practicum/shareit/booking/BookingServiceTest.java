@@ -621,9 +621,7 @@ public class BookingServiceTest {
 
         Booking booking = Booking.builder().id(1L).item(Item.builder().id(2L).build()).build();
         when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(booking));
-        when(itemRepository.getReferenceById(booking.getItem().getId())).thenReturn
-                (Item.builder().owner(User.builder()
-                        .id(2L).build()).build());
+        when(itemRepository.getReferenceById(booking.getItem().getId())).thenReturn(Item.builder().owner(User.builder().id(2L).build()).build());
 
         assertThrows(ItemNotFoundException.class,
                 () -> bookingService.updateBookingStatus(1L, true, 1L));
@@ -638,9 +636,7 @@ public class BookingServiceTest {
 
         Booking booking = Booking.builder().id(1L).status(APPROVED).item(Item.builder().id(2L).build()).build();
         when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(booking));
-        when(itemRepository.getReferenceById(booking.getItem().getId())).thenReturn
-                (Item.builder().owner(User.builder()
-                        .id(1L).build()).build());
+        when(itemRepository.getReferenceById(booking.getItem().getId())).thenReturn(Item.builder().owner(User.builder().id(1L).build()).build());
 
         assertThrows(BookingAlreadyApprovedException.class,
                 () -> bookingService.updateBookingStatus(1L, true, 1L));
@@ -666,14 +662,10 @@ public class BookingServiceTest {
                 .booker(User.builder().id(1L).name("name").email("email@email.ru").build())
                 .build();
 
-        when(bookingRepository.findAllByBookerIdAndEndTimeIsBeforeOrderByStartTimeDesc
-                (eq(request.getUserId()), any(LocalDateTime.class))).thenReturn(List.of(booking));
+        when(bookingRepository.findAllByBookerIdAndEndTimeIsBeforeOrderByStartTimeDesc(eq(request.getUserId()), any(LocalDateTime.class))).thenReturn(List.of(booking));
 
         when(bookingDtoMapper.toBookingDto(anyList(), eq(userDtoMapper), eq(itemDtoMapper))).thenReturn(
-                List.of(BookingDto.builder().id(booking.getId())
-                        .status(booking.getStatus())
-                        .end(booking.getEndTime())
-                        .start(booking.getStartTime()).build())
+                List.of(BookingDto.builder().id(booking.getId()).status(booking.getStatus()).end(booking.getEndTime()).start(booking.getStartTime()).build())
         );
 
         List<BookingDto> result = bookingService.getAllByBookerId(request);
@@ -711,8 +703,7 @@ public class BookingServiceTest {
                 .booker(User.builder().id(1L).name("name").email("email@email.ru").build())
                 .build();
 
-        when(bookingRepository.findBookingsByBookerIdAndStartTimeIsAfterOrderByStartTimeDesc
-                (eq(request.getUserId()), any(LocalDateTime.class))).thenReturn(List.of(booking));
+        when(bookingRepository.findBookingsByBookerIdAndStartTimeIsAfterOrderByStartTimeDesc(eq(request.getUserId()), any(LocalDateTime.class))).thenReturn(List.of(booking));
 
         when(bookingDtoMapper.toBookingDto(anyList(), eq(userDtoMapper), eq(itemDtoMapper))).thenReturn(
                 List.of(BookingDto.builder().id(booking.getId())
