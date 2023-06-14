@@ -101,7 +101,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "bookingsByState", key = "#request")
+//    @Cacheable(value = "bookingsByState", key = "#request")
     public List<BookingDto> getAllByBookerId(BookingGetRequest request) {
         checkUserExistsById(userRepository, request.getUserId());
         boolean isPagination = checkIsPagination(request.getFrom(), request.getSize());
@@ -133,7 +133,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "bookingsByStateForOwner", key = "#request")
+//    @Cacheable(value = "bookingsByStateForOwner", key = "#request")
     public List<BookingDto> getAllByBookerItems(BookingGetRequest request) {
         checkUserExistsById(userRepository, request.getUserId());
         boolean isPagination = checkIsPagination(request.getFrom(), request.getSize());

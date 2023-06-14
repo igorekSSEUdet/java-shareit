@@ -54,7 +54,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    @Cacheable(value = "request", key = "#requestId")
+//    @Cacheable(value = "request", key = "#requestId")
     public ItemRequestDto getRequestById(Long requestId, Long userId) {
         checkUserExistsById(userRepository, userId);
         checkRequestExistsById(requestRepository, requestId);

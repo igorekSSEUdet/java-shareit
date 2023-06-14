@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = "users", key = "#userId")
+//    @Cacheable(value = "users", key = "#userId")
     @Transactional(readOnly = true)
     public UserDto getUserById(Long userId) {
         checkUserExistsById(userRepository, userId);
@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @CacheEvict(value = "users", key = "#userId")
+//    @CacheEvict(value = "users", key = "#userId")
     public void deleteUserById(Long userId) {
         checkUserExistsById(userRepository, userId);
         log.debug("User ID_{} deleted.", userId);
