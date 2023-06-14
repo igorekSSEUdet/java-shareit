@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingCreationRequestDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.exception.StateNotImplementedException;
+import ru.practicum.shareit.booking.exception.IncorrectStateException;
 import ru.practicum.shareit.booking.mapper.BookingDtoMapper;
-import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.Booking.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.booking.repository.model.Booking;
+import ru.practicum.shareit.booking.repository.model.Booking.Status;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.mapper.ItemDtoMapper;
 import ru.practicum.shareit.user.mapper.UserDtoMapper;
@@ -127,7 +127,7 @@ public class BookingServiceImpl implements BookingService {
                 return bookingDtoMapper.toBookingDto(getBookingsByRejectedState(isPagination, request),
                         userDtoMapper, itemDtoMapper);
             default:
-                throw StateNotImplementedException.getFromState(state);
+                throw IncorrectStateException.getFromIncorrectState(request.getPossibleState());
         }
     }
 
@@ -159,7 +159,7 @@ public class BookingServiceImpl implements BookingService {
                 return bookingDtoMapper.toBookingDto(getBookingsByOwnerWithRejectedState(isPagination, request),
                         userDtoMapper, itemDtoMapper);
             default:
-                throw StateNotImplementedException.getFromState(state);
+                throw IncorrectStateException.getFromIncorrectState(request.getPossibleState());
         }
     }
 

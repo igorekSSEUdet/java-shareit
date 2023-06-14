@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.practicum.shareit.booking.controller.BookingController;
 import ru.practicum.shareit.booking.dto.BookingCreationRequestDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.model.Booking.Status;
+import ru.practicum.shareit.booking.repository.model.Booking.Status;
 import ru.practicum.shareit.booking.service.BookingGetRequest;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.utills.UserHttpHeaders;

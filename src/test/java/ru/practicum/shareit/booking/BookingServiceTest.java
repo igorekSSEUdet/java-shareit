@@ -11,8 +11,8 @@ import ru.practicum.shareit.booking.dto.BookingCreationRequestDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.exception.*;
 import ru.practicum.shareit.booking.mapper.BookingDtoMapper;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.booking.repository.model.Booking;
 import ru.practicum.shareit.booking.service.BookingGetRequest;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
@@ -34,8 +34,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
-import static ru.practicum.shareit.booking.model.Booking.Status.*;
-import static ru.practicum.shareit.booking.model.Booking.builder;
+import static ru.practicum.shareit.booking.repository.model.Booking.Status.*;
+import static ru.practicum.shareit.booking.repository.model.Booking.builder;
 import static ru.practicum.shareit.booking.service.BookingService.State.FUTURE;
 import static ru.practicum.shareit.booking.service.BookingService.State.PAST;
 
@@ -164,6 +164,46 @@ public class BookingServiceTest {
     }
 
     @Test
+    public void testUpdateBookingStatusBookingNotExists() {
+        when(bookingRepository.existsById(anyLong())).thenReturn(false);
+        assertThrows(BookingNotFoundException.class, () ->
+                bookingService.updateBookingStatus(1L, Boolean.TRUE, 1L));
+    }
+
+    @Test
+    public void testUpdateBookingStatuUserNotExists() {
+        when(bookingRepository.existsById(anyLong())).thenReturn(true);
+        when(userRepository.existsById(anyLong())).thenReturn(false);
+
+        assertThrows(UserNotFoundException.class, () ->
+                bookingService.updateBookingStatus(1L, Boolean.TRUE, 1L));
+    }
+
+    @Test
+    public void testUpdateBookingStatusNotApprove() {
+        when(bookingRepository.existsById(anyLong())).thenReturn(true);
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+
+        User user = User.builder().id(1L).build();
+
+        Item item = Item.builder().id(1L).owner(user).build();
+
+        Booking booking = new Booking();
+        booking.setStatus(APPROVED);
+        booking.setId(1L);
+        booking.setItem(item);
+        booking.setBooker(user);
+        booking.setStartTime(now().plusDays(2));
+        booking.setEndTime(now().plusDays(3));
+
+        when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(booking));
+        when(itemRepository.getReferenceById(item.getId())).thenReturn(item);
+
+        assertThrows(BookingAlreadyApprovedException.class, () ->
+                bookingService.updateBookingStatus(1L, Boolean.TRUE, 1L));
+    }
+
+    @Test
     public void testGetBooking() {
 
         User user = new User();
@@ -184,6 +224,25 @@ public class BookingServiceTest {
         BookingDto bookingDto = bookingService.getBooking(1L, 1L);
 
         assertEquals(1L, bookingDto.getId());
+    }
+
+    @Test
+    public void testGetBookingUserNotOwnerOrBooker() {
+
+        User user = new User();
+        user.setId(1L);
+        Item item = new Item();
+        item.setOwner(user);
+        Booking booking = new Booking();
+        booking.setId(2L);
+        booking.setBooker(user);
+        booking.setItem(item);
+        when(bookingRepository.existsById(anyLong())).thenReturn(true);
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+
+        when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(booking));
+
+        assertThrows(BookingNotFoundException.class, () -> bookingService.getBooking(1L, 2L));
     }
 
 
@@ -493,9 +552,7 @@ public class BookingServiceTest {
         when(userRepository.existsById(anyLong())).thenReturn(true);
         when(itemRepository.existsById(anyLong())).thenReturn(false);
         BookingCreationRequestDto dto = BookingCreationRequestDto.builder().itemId(1L).build();
-        assertThrows(ItemNotFoundException.class, () -> {
-            bookingService.addBooking(dto, 1L);
-        });
+        assertThrows(ItemNotFoundException.class, () -> bookingService.addBooking(dto, 1L));
 
         verify(itemRepository, times(1)).existsById(anyLong());
     }
@@ -799,7 +856,6 @@ public class BookingServiceTest {
         assertEquals(bookingDto.get(0).getId(), booking.getId());
         assertEquals(bookingDto.get(0).getStart(), booking.getStartTime());
         assertEquals(bookingDto.get(0).getEnd(), booking.getEndTime());
-
 
     }
 

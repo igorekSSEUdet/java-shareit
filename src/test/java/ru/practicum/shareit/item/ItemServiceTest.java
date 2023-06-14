@@ -14,6 +14,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.storage.RequestRepository;
 import ru.practicum.shareit.user.mapper.CommentDtoMapper;
 import ru.practicum.shareit.user.mapper.ItemDtoMapper;
@@ -29,6 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
+import static ru.practicum.shareit.item.service.ItemService.checkHasRequest;
+import static ru.practicum.shareit.user.service.UserService.checkUserExistsById;
 
 @ExtendWith(MockitoExtension.class)
 public class ItemServiceTest {
@@ -190,7 +193,7 @@ public class ItemServiceTest {
 
 
     @Test
-    public void testSearchItemsByNameOrDescription_ItemsFound() {
+    public void testSearchItemsByNameOrDescription() {
         String searchText = "test";
         List<Item> itemList = new ArrayList<>();
         itemList.add(Item.builder().id(1L).available(true).name("test").description("desc").build());
@@ -213,5 +216,51 @@ public class ItemServiceTest {
     }
 
 
+    @Test
+    public void testAddItemOnRequest() {
+
+        Long ownerId = 1L;
+        ItemCreationRequestDto itemDto = new ItemCreationRequestDto();
+        itemDto.setName("Test item");
+        itemDto.setDescription("Test description");
+        itemDto.setRequestId(1L);
+
+        User owner = new User();
+        owner.setId(ownerId);
+
+        Item item = new Item();
+        item.setId(1L);
+        item.setName(itemDto.getName());
+        item.setDescription(itemDto.getDescription());
+        item.setOwner(owner);
+
+        ItemDto itemDtoResult = new ItemDto();
+        itemDtoResult.setId(1L);
+        itemDtoResult.setName(itemDto.getName());
+        itemDtoResult.setDescription(itemDto.getDescription());
+
+        ItemRequest request = ItemRequest.builder().id(1L).build();
+
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+        when(itemDtoMapper.toItem(eq(itemDto), anyLong())).thenReturn(item);
+        when(itemRepository.save(any())).thenReturn(item);
+        when(requestRepository.findById(request.getId())).thenReturn(Optional.of(request));
+        when(itemDtoMapper.toItemDto(item)).thenReturn(itemDtoResult);
+
+        ItemDto createdItem = itemService.addItem(itemDto, ownerId);
+        assertEquals(createdItem.getId(), item.getId());
+        assertEquals(createdItem.getName(), item.getName());
+        assertEquals(createdItem.getDescription(), item.getDescription());
+
+    }
+
+    private ItemDto addItemOnRequest(ItemCreationRequestDto itemDto, Long ownerId) {
+        checkHasRequest(requestRepository, itemDto.getRequestId());
+        checkUserExistsById(userRepository, ownerId);
+        Item item = itemDtoMapper.toItem(itemDto, ownerId);
+        Item addedItem = itemRepository.save(item);
+        return itemDtoMapper.toItemDto(addedItem);
+
+    }
 }
 

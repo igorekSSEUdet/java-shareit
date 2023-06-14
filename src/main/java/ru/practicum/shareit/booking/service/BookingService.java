@@ -3,8 +3,8 @@ package ru.practicum.shareit.booking.service;
 import ru.practicum.shareit.booking.dto.BookingCreationRequestDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.exception.*;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.booking.repository.model.Booking;
 import ru.practicum.shareit.exception.IncorrectDataException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -12,7 +12,7 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static ru.practicum.shareit.booking.model.Booking.Status.APPROVED;
+import static ru.practicum.shareit.booking.repository.model.Booking.Status.APPROVED;
 
 public interface BookingService {
     static void checkBookingTimePeriod(LocalDateTime start, LocalDateTime end) {

@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking.model;
+package ru.practicum.shareit.booking.repository.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
