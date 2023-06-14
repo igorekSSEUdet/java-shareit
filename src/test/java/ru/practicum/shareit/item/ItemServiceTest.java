@@ -30,8 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
-import static ru.practicum.shareit.item.service.ItemService.checkHasRequest;
-import static ru.practicum.shareit.user.service.UserService.checkUserExistsById;
 
 @ExtendWith(MockitoExtension.class)
 public class ItemServiceTest {
@@ -254,13 +252,5 @@ public class ItemServiceTest {
 
     }
 
-    private ItemDto addItemOnRequest(ItemCreationRequestDto itemDto, Long ownerId) {
-        checkHasRequest(requestRepository, itemDto.getRequestId());
-        checkUserExistsById(userRepository, ownerId);
-        Item item = itemDtoMapper.toItem(itemDto, ownerId);
-        Item addedItem = itemRepository.save(item);
-        return itemDtoMapper.toItemDto(addedItem);
-
-    }
 }
 

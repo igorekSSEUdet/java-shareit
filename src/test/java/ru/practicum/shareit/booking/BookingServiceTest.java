@@ -34,10 +34,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
+import static ru.practicum.shareit.booking.repository.model.Booking.Status.REJECTED;
+import static ru.practicum.shareit.booking.repository.model.Booking.Status.WAITING;
 import static ru.practicum.shareit.booking.repository.model.Booking.Status.*;
 import static ru.practicum.shareit.booking.repository.model.Booking.builder;
-import static ru.practicum.shareit.booking.service.BookingService.State.FUTURE;
-import static ru.practicum.shareit.booking.service.BookingService.State.PAST;
+import static ru.practicum.shareit.booking.service.BookingService.State.*;
 
 @ExtendWith(MockitoExtension.class)
 public class BookingServiceTest {
@@ -786,6 +787,50 @@ public class BookingServiceTest {
     }
 
     @Test
+    public void testGetAllBookingsByBookerIdStatusCurrent() {
+
+        BookingGetRequest request = BookingGetRequest.builder()
+                .size(null)
+                .from(null)
+                .userId(1L)
+                .possibleState(String.valueOf(CURRENT)).build();
+
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+        Booking booking = Booking.builder()
+                .id(1L)
+                .status(WAITING)
+                .endTime(LocalDateTime.now().plusDays(5))
+                .startTime(LocalDateTime.now().minusDays(3))
+                .item(Item.builder().id(5L).available(Boolean.TRUE).description("desc").build())
+                .booker(User.builder().id(1L).name("name").email("email@email.ru").build())
+                .build();
+
+        when(bookingRepository.findBookingByBookerIdAndStartTimeIsBeforeAndEndTimeIsAfter(eq(request.getUserId()), any(LocalDateTime.class), any(LocalDateTime.class))).thenReturn(List.of(booking));
+
+        when(bookingDtoMapper.toBookingDto(anyList(), eq(userDtoMapper), eq(itemDtoMapper))).thenReturn(
+                List.of(BookingDto.builder().id(booking.getId())
+                        .status(booking.getStatus())
+                        .end(booking.getEndTime())
+                        .start(booking.getStartTime()).build())
+        );
+
+        List<BookingDto> result = bookingService.getAllByBookerId(request);
+
+        assertEquals(result.size(), 1);
+        assertEquals(result.get(0).getId(), 1L);
+        assertEquals(result.get(0).getStart(), booking.getStartTime());
+        assertEquals(result.get(0).getEnd(), booking.getEndTime());
+        assertEquals(result.get(0).getStatus(), booking.getStatus());
+
+        verify(userRepository, times(1)).existsById(anyLong());
+        verify(userRepository, times(1)).existsById(anyLong());
+        verify(bookingDtoMapper, times(1)).toBookingDto(anyList(), eq(userDtoMapper), eq(itemDtoMapper));
+        verify(bookingRepository, times(1)).findBookingByBookerIdAndStartTimeIsBeforeAndEndTimeIsAfter(
+                anyLong(), any(LocalDateTime.class), any(LocalDateTime.class));
+
+    }
+
+    @Test
     public void testGetAllBookingsByBookerIdStatusFutureWithPagination() {
 
         Booking booking = builder().id(1L).status(WAITING)
@@ -810,6 +855,44 @@ public class BookingServiceTest {
         BookingGetRequest request = BookingGetRequest.builder()
                 .userId(1L)
                 .possibleState(String.valueOf(FUTURE))
+                .from(from)
+                .size(size).build();
+
+        List<BookingDto> bookingDto = bookingService.getAllByBookerId(request);
+
+        assertEquals(bookingDto.get(0).getId(), 1L);
+        assertEquals(bookingDto.get(0).getStatus(), booking.getStatus());
+        assertEquals(bookingDto.get(0).getId(), booking.getId());
+        assertEquals(bookingDto.get(0).getStart(), booking.getStartTime());
+        assertEquals(bookingDto.get(0).getEnd(), booking.getEndTime());
+
+    }
+
+    @Test
+    public void testGetAllBookingsByBookerIdStatusCurrentWithPagination() {
+
+        Booking booking = builder().id(1L).status(WAITING)
+                .startTime(LocalDateTime.now().plusDays(3))
+                .endTime(LocalDateTime.now().plusDays(5)).build();
+
+        int from = 0;
+        int size = 5;
+
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+
+        when(bookingRepository.findBookingByBookerIdAndStartTimeIsBeforeAndEndTimeIsAfter(anyLong(),
+                any(LocalDateTime.class), any(LocalDateTime.class), eq(PageRequest.of(from, size))))
+                .thenReturn(new PageImpl<>(List.of(booking)));
+
+        when(bookingDtoMapper.toBookingDto(List.of(booking), userDtoMapper, itemDtoMapper))
+                .thenReturn(List.of(BookingDto.builder().id(1L)
+                        .status(booking.getStatus())
+                        .start(booking.getStartTime())
+                        .end(booking.getEndTime())
+                        .build()));
+        BookingGetRequest request = BookingGetRequest.builder()
+                .userId(1L)
+                .possibleState(String.valueOf(CURRENT))
                 .from(from)
                 .size(size).build();
 
@@ -904,13 +987,49 @@ public class BookingServiceTest {
                 .size(null).build();
 
         List<BookingDto> bookingDto = bookingService.getAllByBookerItems(request);
-        System.out.println(bookingDto);
         assertEquals(bookingDto.get(0).getId(), booking.getId());
         assertEquals(bookingDto.get(0).getStatus(), booking.getStatus());
         assertEquals(bookingDto.get(0).getStart(), booking.getStartTime());
         assertEquals(bookingDto.get(0).getEnd(), booking.getEndTime());
 
     }
+
+    @Test
+    public void testGetAllBookingsByBookerIdStatusCurrentForOwner() {
+
+        Booking booking = builder().id(1L).status(WAITING)
+                .startTime(now().minusDays(5))
+                .endTime(now().plusDays(3))
+                .build();
+
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+
+        when(bookingRepository.findBookingsByItemOwnerIdAndStartTimeIsBeforeAndEndTimeIsAfter(anyLong(),
+                any(LocalDateTime.class), any(LocalDateTime.class)))
+                .thenReturn(List.of(booking));
+
+        when(bookingDtoMapper.toBookingDto(List.of(booking), userDtoMapper, itemDtoMapper))
+                .thenReturn(List.of(BookingDto.builder()
+                        .id(1L)
+                        .start(booking.getStartTime())
+                        .end(booking.getEndTime())
+                        .status(booking.getStatus()).build()));
+
+
+        BookingGetRequest request = BookingGetRequest.builder()
+                .userId(1L)
+                .possibleState(String.valueOf(CURRENT))
+                .from(null)
+                .size(null).build();
+
+        List<BookingDto> bookingDto = bookingService.getAllByBookerItems(request);
+        assertEquals(bookingDto.get(0).getId(), booking.getId());
+        assertEquals(bookingDto.get(0).getStatus(), booking.getStatus());
+        assertEquals(bookingDto.get(0).getStart(), booking.getStartTime());
+        assertEquals(bookingDto.get(0).getEnd(), booking.getEndTime());
+
+    }
+
 
     @Test
     public void testGetAllBookingsByBookerIdStatusFutureForOwner() {
@@ -977,6 +1096,45 @@ public class BookingServiceTest {
         BookingGetRequest request = BookingGetRequest.builder()
                 .userId(1L)
                 .possibleState(String.valueOf(PAST))
+                .from(from)
+                .size(size).build();
+
+        List<BookingDto> bookingDto = bookingService.getAllByBookerItems(request);
+
+        assertEquals(bookingDto.get(0).getId(), 1L);
+        assertEquals(bookingDto.get(0).getStatus(), booking.getStatus());
+        assertEquals(bookingDto.get(0).getStart(), booking.getStartTime());
+        assertEquals(bookingDto.get(0).getEnd(), booking.getEndTime());
+
+    }
+
+    @Test
+    public void testGetAllBookingsByBookerIdStatusCurrentWithPaginationForOwner() {
+
+        Booking booking = builder().id(1L).status(WAITING)
+                .startTime(now().minusDays(5))
+                .endTime(now().minusDays(3))
+                .build();
+
+        int from = 0;
+        int size = 5;
+
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+
+        when(bookingRepository.findBookingsByItemOwnerIdAndStartTimeIsBeforeAndEndTimeIsAfter(anyLong(),
+                any(LocalDateTime.class), any(LocalDateTime.class), eq(PageRequest.of(from, size))))
+                .thenReturn(new PageImpl<>(List.of(booking)));
+
+        when(bookingDtoMapper.toBookingDto(List.of(booking), userDtoMapper, itemDtoMapper))
+                .thenReturn(List.of(BookingDto.builder()
+                        .id(1L)
+                        .start(booking.getStartTime())
+                        .end(booking.getEndTime())
+                        .status(booking.getStatus()).build()));
+
+        BookingGetRequest request = BookingGetRequest.builder()
+                .userId(1L)
+                .possibleState(String.valueOf(CURRENT))
                 .from(from)
                 .size(size).build();
 

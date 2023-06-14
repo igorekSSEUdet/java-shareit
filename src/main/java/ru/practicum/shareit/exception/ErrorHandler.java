@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.Map;
 
 @RestControllerAdvice
-//(assignableTypes = {ItemController.class, UserController.class, BookingController.class,
-//ItemRequestController.class})
 @Slf4j
 public class ErrorHandler {
     @ExceptionHandler
@@ -22,21 +20,6 @@ public class ErrorHandler {
         log.error("Request header error: {}", ex.getMessage());
         return ErrorResponse.getFromException(ex);
     }
-
-//    @ExceptionHandler
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public ErrorResponse methodArgumentNotValidExceptionHandler(final MethodArgumentNotValidException ex) {
-//        String message = ex.getBindingResult()
-//                .getFieldErrors().stream()
-//                .map(fieldError -> String.format(
-//                        "field '%s' %s",
-//                        fieldError.getField(),
-//                        fieldError.getDefaultMessage()))
-//                .collect(Collectors.joining(", "));
-//
-//        log.error("Validation error: {}.", message);
-//        return ErrorResponse.getFromExceptionAndMessage(ex, message);
-//    }
 
     @ExceptionHandler({MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
