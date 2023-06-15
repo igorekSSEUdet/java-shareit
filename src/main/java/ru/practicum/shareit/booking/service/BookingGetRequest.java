@@ -11,5 +11,4 @@ public class BookingGetRequest {
     private Integer from;
     private Integer size;
 
-
 }
