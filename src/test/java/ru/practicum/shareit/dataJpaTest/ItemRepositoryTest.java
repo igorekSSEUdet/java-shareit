@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.DirtiesContext;
-import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.model.ItemRequest;
@@ -45,11 +44,11 @@ public class ItemRepositoryTest {
         itemRepository.save(item);
 
         List<Item> result = itemRepository.findByOwnerId(item.getOwner().getId());
-        assertEquals(result.get(0).getName(),item.getName());
-        assertEquals(result.get(0).getDescription(),item.getDescription());
-        assertEquals(result.get(0).getAvailable(),item.getAvailable());
-        assertEquals(result.get(0).getOwner(),addedUser);
-        assertEquals(result.get(0).getRequest(),addedRequest);
+        assertEquals(result.get(0).getName(), item.getName());
+        assertEquals(result.get(0).getDescription(), item.getDescription());
+        assertEquals(result.get(0).getAvailable(), item.getAvailable());
+        assertEquals(result.get(0).getOwner(), addedUser);
+        assertEquals(result.get(0).getRequest(), addedRequest);
 
     }
 
@@ -67,13 +66,12 @@ public class ItemRepositoryTest {
         item.setOwner(addedUser);
         item.setRequest(addedRequest);
         itemRepository.save(item);
-
-        List<Item> result = itemRepository.findByAvailableIsTrue(   );
-        assertEquals(result.get(0).getName(),item.getName());
-        assertEquals(result.get(0).getDescription(),item.getDescription());
-        assertEquals(result.get(0).getAvailable(),item.getAvailable());
-        assertEquals(result.get(0).getOwner(),addedUser);
-        assertEquals(result.get(0).getRequest(),addedRequest);
+        List<Item> result = itemRepository.findByAvailableIsTrue();
+        assertEquals(result.get(0).getName(), item.getName());
+        assertEquals(result.get(0).getDescription(), item.getDescription());
+        assertEquals(result.get(0).getAvailable(), item.getAvailable());
+        assertEquals(result.get(0).getOwner(), addedUser);
+        assertEquals(result.get(0).getRequest(), addedRequest);
 
     }
 
@@ -93,11 +91,11 @@ public class ItemRepositoryTest {
         itemRepository.save(item);
 
         List<Item> result = itemRepository.findAllByRequestId(item.getRequest().getId());
-        assertEquals(result.get(0).getName(),item.getName());
-        assertEquals(result.get(0).getDescription(),item.getDescription());
-        assertEquals(result.get(0).getAvailable(),item.getAvailable());
-        assertEquals(result.get(0).getOwner(),addedUser);
-        assertEquals(result.get(0).getRequest(),addedRequest);
+        assertEquals(result.get(0).getName(), item.getName());
+        assertEquals(result.get(0).getDescription(), item.getDescription());
+        assertEquals(result.get(0).getAvailable(), item.getAvailable());
+        assertEquals(result.get(0).getOwner(), addedUser);
+        assertEquals(result.get(0).getRequest(), addedRequest);
 
     }
 
