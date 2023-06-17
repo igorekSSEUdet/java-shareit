@@ -42,7 +42,7 @@ public interface ItemService {
 
     DetailedItemDto getItemByItemId(Long itemId, Long userId);
 
-    List<DetailedItemDto> getItemsByOwnerId(Long ownerId);
+    List<DetailedItemDto> getItemsByOwnerId(Long ownerId, Integer from, Integer size);
 
-    List<ItemDto> searchItemsByNameOrDescription(String text);
+    List<ItemDto> searchItemsByNameOrDescription(String text, Integer from, Integer size);
 }

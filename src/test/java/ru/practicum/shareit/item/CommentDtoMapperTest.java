@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 public class CommentDtoMapperTest {
 
     @InjectMocks
-    CommentDtoMapper mapper;
+    private CommentDtoMapper mapper;
     @Mock
     private UserRepository userRepository;
     @Mock

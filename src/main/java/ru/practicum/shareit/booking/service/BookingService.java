@@ -5,7 +5,6 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.exception.*;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.repository.model.Booking;
-import ru.practicum.shareit.exception.IncorrectDataException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 
@@ -51,10 +50,6 @@ public interface BookingService {
         if (item.getAvailable() == Boolean.FALSE) {
             throw ItemNotAvailableForBookingException.getFromItemId(item.getId());
         }
-    }
-
-    static void validFromParameter(Integer from) {
-        if (from < 0) throw new IncorrectDataException("From parameter can not be less than zero");
     }
 
     static void checkUserNotOwnerByItemIdAndUserId(ItemRepository itemRepository, Long itemId, Long userId) {

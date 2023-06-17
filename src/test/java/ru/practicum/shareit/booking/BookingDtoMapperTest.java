@@ -33,11 +33,11 @@ import static org.mockito.Mockito.when;
 public class BookingDtoMapperTest {
 
     @Mock
-    UserDtoMapper userDtoMapper;
+    private UserDtoMapper userDtoMapper;
     @Mock
-    ItemDtoMapper itemDtoMapper;
+    private ItemDtoMapper itemDtoMapper;
     @InjectMocks
-    BookingDtoMapper mapper;
+    private BookingDtoMapper mapper;
     @Mock
     private ItemRepository itemRepository;
     @Mock

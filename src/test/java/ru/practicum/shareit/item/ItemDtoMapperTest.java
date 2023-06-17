@@ -36,7 +36,7 @@ import static ru.practicum.shareit.booking.repository.model.Booking.Status.APPRO
 public class ItemDtoMapperTest {
 
     @InjectMocks
-    ItemDtoMapper mapper;
+    private ItemDtoMapper mapper;
     @Mock
     private ItemRepository itemRepository;
     @Mock

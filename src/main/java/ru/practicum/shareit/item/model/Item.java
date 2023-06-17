@@ -35,7 +35,7 @@ public class Item {
     private User owner;
 
     @ManyToOne
-    @JoinColumn(name = "requester_id")
+    @JoinColumn(name = "request_id")
     private ItemRequest request;
 
 }

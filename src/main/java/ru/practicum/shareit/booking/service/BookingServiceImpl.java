@@ -18,6 +18,7 @@ import ru.practicum.shareit.user.mapper.ItemDtoMapper;
 import ru.practicum.shareit.user.mapper.UserDtoMapper;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -101,8 +102,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-//    @Cacheable(value = "bookingsByState", key = "#request")
-    public List<BookingDto> getAllByBookerId(BookingGetRequest request) {
+    public List<BookingDto> getAllByBookerId(@Valid BookingGetRequest request) {
         checkUserExistsById(userRepository, request.getUserId());
         boolean isPagination = checkIsPagination(request.getFrom(), request.getSize());
 
@@ -133,7 +133,6 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-//    @Cacheable(value = "bookingsByStateForOwner", key = "#request")
     public List<BookingDto> getAllByBookerItems(BookingGetRequest request) {
         checkUserExistsById(userRepository, request.getUserId());
         boolean isPagination = checkIsPagination(request.getFrom(), request.getSize());
@@ -372,11 +371,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private boolean checkIsPagination(Integer from, Integer size) {
-        if (from == null || size == null) return false;
-        else {
-            validFromParameter(from);
-            return true;
-        }
+        return from != null && size != null;
     }
 
 }

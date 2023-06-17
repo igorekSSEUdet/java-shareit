@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 public class RequestDtoMapperTest {
 
     @InjectMocks
-    RequestDtoMapper mapper;
+    private RequestDtoMapper mapper;
     @Mock
     private ItemRepository itemRepository;
     @Mock

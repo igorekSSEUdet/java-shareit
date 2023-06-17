@@ -37,7 +37,7 @@ public class BookingControllerTest {
 
     private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
     @InjectMocks
-    BookingController controller;
+    private BookingController controller;
     @Mock
     private BookingService bookingService;
     private MockMvc mvc;

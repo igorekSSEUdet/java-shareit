@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.mapper.BookingDtoMapper;
@@ -94,26 +95,52 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<DetailedItemDto> getItemsByOwnerId(Long ownerId) {
-        List<Item> items = itemRepository.findByOwnerId(ownerId);
+    public List<DetailedItemDto> getItemsByOwnerId(Long ownerId, Integer from, Integer size) {
+        if (!isRequestWithPagination(from, size)) {
+            List<Item> items = itemRepository.findByOwnerId(ownerId);
+            log.debug("All items have been returned, {} in total.", items.size());
+            return itemDtoMapper.toDetailedItemDto(items, commentDtoMapper, bookingDtoMapper);
+        }
+        return getItemsByOwnerIdWithPagination(ownerId, from, size);
+    }
+
+    private List<DetailedItemDto> getItemsByOwnerIdWithPagination(Long ownerId, Integer from, Integer size) {
+        List<Item> items = itemRepository.findByOwnerId(ownerId, PageRequest.of(from, size)).getContent();
         log.debug("All items have been returned, {} in total.", items.size());
         return itemDtoMapper.toDetailedItemDto(items, commentDtoMapper, bookingDtoMapper);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> searchItemsByNameOrDescription(String text) {
+    public List<ItemDto> searchItemsByNameOrDescription(String text, Integer from, Integer size) {
         if (StringUtils.isEmpty(text)) {
             return Collections.emptyList();
         }
+        if (!isRequestWithPagination(from, size)) {
+            List<Item> foundItems = itemRepository.findByAvailableIsTrue()
+                    .stream()
+                    .filter(itemDto -> StringUtils.containsIgnoreCase(itemDto.getName(), text)
+                            || StringUtils.containsIgnoreCase(itemDto.getDescription(), text))
+                    .collect(Collectors.toList());
+            log.debug("Returned items containing '{}', {} in total.", text, foundItems.size());
 
+            return itemDtoMapper.toItemDto(foundItems);
+        }
+        return searchItemsByNameOrDescriptionWithPagination(text, from, size);
+    }
+
+    private List<ItemDto> searchItemsByNameOrDescriptionWithPagination(String text, Integer from, Integer size) {
         List<Item> foundItems = itemRepository.findByAvailableIsTrue()
                 .stream()
                 .filter(itemDto -> StringUtils.containsIgnoreCase(itemDto.getName(), text)
                         || StringUtils.containsIgnoreCase(itemDto.getDescription(), text))
+                .skip(from)
+                .limit(size)
                 .collect(Collectors.toList());
-        log.debug("Returned items containing '{}', {} in total.", text, foundItems.size());
-
         return itemDtoMapper.toItemDto(foundItems);
+    }
+
+    private boolean isRequestWithPagination(Integer from, Integer size) {
+        return from != null && size != null;
     }
 }
