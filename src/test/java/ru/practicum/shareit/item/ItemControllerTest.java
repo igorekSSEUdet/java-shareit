@@ -144,7 +144,7 @@ public class ItemControllerTest {
                 .description("desc")
                 .name("name").build();
 
-        when(itemService.getItemsByOwnerId(ownerId, null, null))
+        when(itemService.getItemsByOwnerId(ownerId,null,null))
                 .thenReturn(List.of(detailedDto));
 
         mvc.perform(get("/items")
@@ -172,7 +172,7 @@ public class ItemControllerTest {
                 .description("desc")
                 .name("name").build();
 
-        when(itemService.searchItemsByNameOrDescription(searchText, null, null))
+        when(itemService.searchItemsByNameOrDescription(searchText,null,null))
                 .thenReturn(List.of(detailedDto));
 
         mvc.perform(get("/items/search")

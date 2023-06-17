@@ -181,7 +181,7 @@ public class ItemServiceTest {
         when(itemDtoMapper.toDetailedItemDto(anyList(), eq(commentDtoMapper), eq(bookingDtoMapper)))
                 .thenReturn(expectedItemList);
 
-        List<DetailedItemDto> itemList = itemService.getItemsByOwnerId(ownerId, null, null);
+        List<DetailedItemDto> itemList = itemService.getItemsByOwnerId(ownerId,null,null);
 
         assertEquals(expectedItemList, itemList);
         verify(itemRepository, times(1)).findByOwnerId(ownerId);
@@ -205,7 +205,7 @@ public class ItemServiceTest {
         when(itemRepository.findByAvailableIsTrue()).thenReturn(itemList);
         when(itemDtoMapper.toItemDto(itemList)).thenReturn(itemDto);
 
-        List<ItemDto> result = itemService.searchItemsByNameOrDescription(searchText, null, null);
+        List<ItemDto> result = itemService.searchItemsByNameOrDescription(searchText,null,null);
 
         assertFalse(result.isEmpty());
         assertEquals(2, result.size());
