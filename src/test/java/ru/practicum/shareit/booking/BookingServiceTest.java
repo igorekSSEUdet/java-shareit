@@ -38,7 +38,7 @@ import static ru.practicum.shareit.booking.repository.model.Booking.Status.REJEC
 import static ru.practicum.shareit.booking.repository.model.Booking.Status.WAITING;
 import static ru.practicum.shareit.booking.repository.model.Booking.Status.*;
 import static ru.practicum.shareit.booking.repository.model.Booking.builder;
-import static ru.practicum.shareit.booking.service.BookingService.State.*;
+import static ru.practicum.shareit.booking.service.State.*;
 
 @ExtendWith(MockitoExtension.class)
 public class BookingServiceTest {

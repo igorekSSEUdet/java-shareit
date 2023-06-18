@@ -81,7 +81,4 @@ public interface BookingService {
 
     List<BookingDto> getAllByBookerItems(BookingGetRequest request);
 
-    enum State {
-        ALL, CURRENT, PAST, FUTURE, WAITING, REJECTED
-    }
 }
