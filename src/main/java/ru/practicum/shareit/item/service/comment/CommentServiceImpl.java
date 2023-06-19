@@ -7,10 +7,10 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.RequestCommentDto;
-import ru.practicum.shareit.user.mapper.CommentDtoMapper;
 import ru.practicum.shareit.item.model.comment.Comment;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.repository.comment.CommentRepository;
+import ru.practicum.shareit.user.mapper.CommentDtoMapper;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import static java.time.LocalDateTime.now;

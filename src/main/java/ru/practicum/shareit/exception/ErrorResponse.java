@@ -16,7 +16,4 @@ public final class ErrorResponse {
         return new ErrorResponse(th.getMessage(), th.getClass().getSimpleName());
     }
 
-    public static ErrorResponse getFromExceptionAndMessage(Throwable th, String message) {
-        return new ErrorResponse(message, th.getClass().getSimpleName());
-    }
 }

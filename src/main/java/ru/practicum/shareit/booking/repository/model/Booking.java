@@ -1,19 +1,20 @@
-package ru.practicum.shareit.booking.model;
+package ru.practicum.shareit.booking.repository.model;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-
 @Entity
 @Table(name = "bookings")
-@Setter
-@Getter
+@Data
+@AllArgsConstructor
+@Builder
 @NoArgsConstructor
 public class Booking {
     @Id
@@ -38,3 +39,5 @@ public class Booking {
         WAITING, APPROVED, REJECTED, CANCELED
     }
 }
+
+
