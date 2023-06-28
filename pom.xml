@@ -109,6 +109,21 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.1.0</version>
+					<configuration>
+						<archive>
+							<manifest>
+								<mainClass>src/main/java/ru/practicum/shareit/ShareItApp.java</mainClass>
+							</manifest>
+						</archive>
+					</configuration>
+				</plugin>
+
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
